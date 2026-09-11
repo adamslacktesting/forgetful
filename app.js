@@ -10,6 +10,9 @@ let currentTheme = 'light';
 const themeToggleBtn = document.getElementById('theme-toggle-btn');
 const themeToggleIcon = document.getElementById('theme-toggle-icon');
 const themeToggleText = document.getElementById('theme-toggle-text');
+const shortcutsInfoBtn = document.getElementById('shortcuts-info-btn');
+const shortcutsModal = document.getElementById('shortcuts-modal');
+const closeModalBtn = document.getElementById('close-modal-btn');
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
 const todoList = document.getElementById('todo-list');
@@ -28,6 +31,13 @@ function init() {
   setupCanvas();
   bindEvents();
   render();
+  focusTodoInput();
+}
+
+function focusTodoInput() {
+  if (todoInput) {
+    todoInput.focus();
+  }
 }
 
 // Theme Management
@@ -174,8 +184,107 @@ function bindEvents() {
     clearCompleted();
   });
 
+  // Shortcuts Modal Controls
+  if (shortcutsInfoBtn) {
+    shortcutsInfoBtn.addEventListener('click', () => {
+      toggleShortcutsModal(true);
+    });
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', () => {
+      toggleShortcutsModal(false);
+    });
+  }
+
+  if (shortcutsModal) {
+    shortcutsModal.addEventListener('click', (e) => {
+      if (e.target === shortcutsModal) {
+        toggleShortcutsModal(false);
+      }
+    });
+  }
+
+  // Global Keyboard Shortcuts
+  document.addEventListener('keydown', handleGlobalShortcuts);
+
   // Drag and Drop Events
   bindDragAndDropEvents();
+}
+
+function toggleShortcutsModal(show) {
+  if (!shortcutsModal) return;
+  const isCurrentlyHidden = shortcutsModal.classList.contains('hidden');
+  const shouldShow = show !== undefined ? show : isCurrentlyHidden;
+
+  if (shouldShow) {
+    shortcutsModal.classList.remove('hidden');
+  } else {
+    shortcutsModal.classList.add('hidden');
+  }
+}
+
+function setFilter(filter) {
+  currentFilter = filter;
+  filterBtns.forEach(btn => {
+    if (btn.dataset.filter === filter) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  render();
+}
+
+function handleGlobalShortcuts(e) {
+  const isModalOpen = shortcutsModal && !shortcutsModal.classList.contains('hidden');
+
+  if (e.key === 'Escape') {
+    if (isModalOpen) {
+      toggleShortcutsModal(false);
+      return;
+    }
+    if (editingId !== null) {
+      cancelEditing();
+      return;
+    }
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
+    return;
+  }
+
+  // Don't intercept shortcuts if user is typing in an input field or modal is open
+  const activeElement = document.activeElement;
+  const isInputActive = activeElement && (
+    activeElement.tagName === 'INPUT' ||
+    activeElement.tagName === 'TEXTAREA' ||
+    activeElement.isContentEditable
+  );
+
+  if (isInputActive || isModalOpen) {
+    return;
+  }
+
+  if (e.key === 'n' || e.key === 'N' || e.key === '/') {
+    e.preventDefault();
+    focusTodoInput();
+  } else if (e.key === '1') {
+    e.preventDefault();
+    setFilter('all');
+  } else if (e.key === '2') {
+    e.preventDefault();
+    setFilter('active');
+  } else if (e.key === '3') {
+    e.preventDefault();
+    setFilter('completed');
+  } else if (e.key === 't' || e.key === 'T') {
+    e.preventDefault();
+    toggleTheme();
+  } else if (e.key === '?' || e.key === 'h' || e.key === 'H') {
+    e.preventDefault();
+    toggleShortcutsModal();
+  }
 }
 
 function bindDragAndDropEvents() {
