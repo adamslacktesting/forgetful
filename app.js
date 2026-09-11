@@ -3,6 +3,7 @@ let todos = [];
 let currentFilter = 'all';
 let draggedId = null;
 let dropTargetPosition = null;
+let editingId = null;
 
 // DOM Elements
 const todoForm = document.getElementById('todo-form');
@@ -66,7 +67,7 @@ function bindEvents() {
     todoInput.focus();
   });
 
-  // Todo List Click (Toggle / Delete)
+  // Todo List Click (Toggle / Delete / Edit)
   todoList.addEventListener('click', (e) => {
     const item = e.target.closest('.todo-item');
     if (!item) return;
@@ -75,7 +76,15 @@ function bindEvents() {
 
     if (e.target.closest('.btn-delete')) {
       deleteTodo(id);
-    } else if (e.target.closest('.checkbox-custom') || e.target.closest('.todo-content')) {
+    } else if (e.target.closest('.btn-edit')) {
+      e.stopPropagation();
+      startEditing(id);
+    } else if (e.target.closest('.todo-edit-input')) {
+      return;
+    } else if (e.target.closest('.checkbox-custom')) {
+      toggleTodo(id);
+    } else if (e.target.closest('.todo-content')) {
+      if (editingId === id) return;
       toggleTodo(id);
     }
   });
@@ -232,8 +241,40 @@ function toggleTodo(id) {
 
 // Delete Todo
 function deleteTodo(id) {
+  if (editingId === id) {
+    editingId = null;
+  }
   todos = todos.filter(t => t.id !== id);
   saveTodos();
+  render();
+}
+
+// Edit Todo Handlers
+function startEditing(id) {
+  const todo = todos.find(t => t.id === id);
+  if (!todo || todo.completed) return;
+  editingId = id;
+  render();
+}
+
+function finishEditing(id, newText) {
+  if (editingId !== id) return;
+  editingId = null;
+
+  const trimmed = newText.trim();
+  if (trimmed) {
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+      todo.text = trimmed;
+      saveTodos();
+    }
+  }
+  render();
+}
+
+function cancelEditing() {
+  if (editingId === null) return;
+  editingId = null;
   render();
 }
 
@@ -285,10 +326,12 @@ function render() {
 
 // Create Todo DOM element
 function createTodoElement(todo) {
+  const isEditing = editingId === todo.id && !todo.completed;
+
   const li = document.createElement('li');
-  li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+  li.className = `todo-item ${todo.completed ? 'completed' : ''} ${isEditing ? 'editing' : ''}`;
   li.dataset.id = todo.id;
-  li.draggable = true;
+  li.draggable = !isEditing;
 
   const dragHandle = document.createElement('div');
   dragHandle.className = 'drag-handle';
@@ -306,12 +349,56 @@ function createTodoElement(todo) {
   checkbox.innerHTML = todo.completed ? '✓' : '';
   checkbox.setAttribute('tabindex', '0');
 
-  const span = document.createElement('span');
-  span.className = 'todo-text';
-  span.textContent = todo.text;
-
   contentDiv.appendChild(checkbox);
-  contentDiv.appendChild(span);
+
+  if (isEditing) {
+    const editInput = document.createElement('input');
+    editInput.type = 'text';
+    editInput.className = 'todo-edit-input';
+    editInput.value = todo.text;
+    editInput.setAttribute('aria-label', 'Edit task text');
+
+    let isFinished = false;
+
+    editInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        isFinished = true;
+        finishEditing(todo.id, editInput.value);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        isFinished = true;
+        cancelEditing();
+      }
+    });
+
+    editInput.addEventListener('blur', () => {
+      if (!isFinished) {
+        finishEditing(todo.id, editInput.value);
+      }
+    });
+
+    contentDiv.appendChild(editInput);
+
+    setTimeout(() => {
+      editInput.focus();
+      editInput.select();
+    }, 0);
+  } else {
+    const span = document.createElement('span');
+    span.className = 'todo-text';
+    span.textContent = todo.text;
+    contentDiv.appendChild(span);
+
+    if (!todo.completed) {
+      const editBtn = document.createElement('button');
+      editBtn.className = 'btn-edit';
+      editBtn.setAttribute('aria-label', 'Edit task');
+      editBtn.setAttribute('title', 'Edit task');
+      editBtn.innerHTML = '✏️';
+      contentDiv.appendChild(editBtn);
+    }
+  }
 
   const deleteBtn = document.createElement('button');
   deleteBtn.className = 'btn-delete';
