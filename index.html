@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>forgetful — a simple + helpful todo app</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+
+  <main class="app-container">
+    <header class="app-header">
+      <div class="badge">DON'T FORGET! 🧠💡</div>
+      <h1 class="app-title">forgetful</h1>
+      <p class="app-subtitle">The big, bold & friendly todo list for things you'll definitely forget otherwise!</p>
+    </header>
+
+    <section class="card input-card">
+      <form id="todo-form" class="todo-form">
+        <input
+          type="text"
+          id="todo-input"
+          class="todo-input"
+          placeholder="What do you need to remember? (e.g. Buy milk 🥛)"
+          autocomplete="off"
+          required
+        />
+        <button type="submit" class="btn btn-primary btn-add">
+          <span class="btn-icon">➕</span>
+          <span>ADD TASK!</span>
+        </button>
+      </form>
+    </section>
+
+    <section class="card list-card">
+      <div class="controls-bar">
+        <div class="filter-group">
+          <button class="btn-filter active" data-filter="all">
+            <span class="filter-label">ALL</span>
+            <span class="filter-count" id="count-all">0</span>
+          </button>
+          <button class="btn-filter" data-filter="active">
+            <span class="filter-label">ACTIVE</span>
+            <span class="filter-count" id="count-active">0</span>
+          </button>
+          <button class="btn-filter" data-filter="completed">
+            <span class="filter-label">DONE</span>
+            <span class="filter-count" id="count-completed">0</span>
+          </button>
+        </div>
+        <button id="clear-completed-btn" class="btn-clear hidden">
+          🧹 Clear Completed
+        </button>
+      </div>
+
+      <ul id="todo-list" class="todo-list"></ul>
+
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">🎉</div>
+        <h3 class="empty-title">Nothing on your mind!</h3>
+        <p class="empty-text">Add a task above before your brain forgets it again!</p>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <p>Made with 💛 so you never forget the small (or big!) stuff.</p>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
