@@ -261,6 +261,24 @@ body {
   box-shadow: 2px 2px 0px var(--shadow-color);
 }
 
+.btn-sparkle {
+  background-color: var(--accent-purple);
+  color: #FFFFFF;
+  padding: 16px 20px;
+  font-size: 1.3rem;
+}
+
+.btn-sparkle:hover {
+  background-color: #7226db;
+  transform: translate(-2px, -2px) rotate(8deg);
+  box-shadow: 7px 7px 0px var(--shadow-color);
+}
+
+.btn-sparkle:active {
+  transform: translate(3px, 3px) rotate(0deg);
+  box-shadow: 2px 2px 0px var(--shadow-color);
+}
+
 /* Controls Bar & Filters */
 .controls-bar {
   display: flex;
@@ -809,7 +827,8 @@ kbd {
     flex-direction: column;
   }
 
-  .btn-add {
+  .btn-add,
+  .btn-sparkle {
     width: 100%;
   }
 
