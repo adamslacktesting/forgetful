@@ -469,16 +469,37 @@ function showUndoToast(deletedTodo, originalIndex) {
   content.appendChild(icon);
   content.appendChild(message);
 
+  const actions = document.createElement('div');
+  actions.className = 'toast-actions';
+
+  let remainingSeconds = 5;
+  const timerBadge = document.createElement('span');
+  timerBadge.className = 'toast-timer';
+  timerBadge.setAttribute('aria-live', 'polite');
+  timerBadge.textContent = `⏱️ ${remainingSeconds}s`;
+
   const undoBtn = document.createElement('button');
   undoBtn.className = 'btn-undo';
   undoBtn.innerHTML = '<span>Undo</span> <span>↩️</span>';
   undoBtn.setAttribute('aria-label', `Undo deletion of ${deletedTodo.text}`);
 
+  actions.appendChild(timerBadge);
+  actions.appendChild(undoBtn);
+
+  const progressBar = document.createElement('div');
+  progressBar.className = 'toast-progress-bar';
+
   let isDismissed = false;
+
+  const cleanup = () => {
+    if (timer) clearTimeout(timer);
+    if (countdownInterval) clearInterval(countdownInterval);
+  };
 
   const dismissToast = () => {
     if (isDismissed) return;
     isDismissed = true;
+    cleanup();
     toast.classList.add('toast-hiding');
     toast.addEventListener('animationend', () => {
       if (toast.parentNode) {
@@ -491,8 +512,15 @@ function showUndoToast(deletedTodo, originalIndex) {
     dismissToast();
   }, 5000);
 
+  const countdownInterval = setInterval(() => {
+    remainingSeconds -= 1;
+    if (remainingSeconds >= 0) {
+      timerBadge.textContent = `⏱️ ${remainingSeconds}s`;
+    }
+  }, 1000);
+
   undoBtn.addEventListener('click', () => {
-    clearTimeout(timer);
+    cleanup();
     if (!isDismissed) {
       isDismissed = true;
       // Restore task at its original position or closest valid index
@@ -511,7 +539,8 @@ function showUndoToast(deletedTodo, originalIndex) {
   });
 
   toast.appendChild(content);
-  toast.appendChild(undoBtn);
+  toast.appendChild(actions);
+  toast.appendChild(progressBar);
 
   toastContainer.appendChild(toast);
 }
