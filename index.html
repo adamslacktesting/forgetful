@@ -16,10 +16,16 @@
     <header class="app-header">
       <div class="header-top">
         <div class="badge">DON'T FORGET! 🧠💡</div>
-        <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle dark/light mode" title="Toggle theme">
-          <span id="theme-toggle-icon" class="theme-toggle-icon">🌙</span>
-          <span id="theme-toggle-text" class="theme-toggle-text">Dark Mode</span>
-        </button>
+        <div class="header-actions">
+          <button id="shortcuts-info-btn" class="info-btn" aria-label="Keyboard Shortcuts" title="Keyboard Shortcuts (?)">
+            <span class="info-icon">⌨️</span>
+            <span class="info-text">Shortcuts</span>
+          </button>
+          <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle dark/light mode" title="Toggle theme">
+            <span id="theme-toggle-icon" class="theme-toggle-icon">🌙</span>
+            <span id="theme-toggle-text" class="theme-toggle-text">Dark Mode</span>
+          </button>
+        </div>
       </div>
       <h1 class="app-title">forgetful</h1>
       <p class="app-subtitle">The big, bold & friendly todo list for things you'll definitely forget otherwise!</p>
@@ -76,6 +82,40 @@
       <p>Made with 💛 so you never forget the small (or big!) stuff.</p>
     </footer>
   </main>
+
+  <!-- Shortcuts Modal -->
+  <div id="shortcuts-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content card">
+      <div class="modal-header">
+        <h2 id="modal-title" class="modal-title">⌨️ Keyboard Shortcuts</h2>
+        <button id="close-modal-btn" class="btn-close-modal" aria-label="Close modal">✖</button>
+      </div>
+      <div class="modal-body">
+        <ul class="shortcuts-list">
+          <li>
+            <span class="shortcut-desc">Focus Task Input</span>
+            <span class="shortcut-keys"><kbd>N</kbd> or <kbd>/</kbd></span>
+          </li>
+          <li>
+            <span class="shortcut-desc">Unfocus / Close Modal / Cancel Edit</span>
+            <span class="shortcut-keys"><kbd>Esc</kbd></span>
+          </li>
+          <li>
+            <span class="shortcut-desc">Switch Filters (All / Active / Done)</span>
+            <span class="shortcut-keys"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></span>
+          </li>
+          <li>
+            <span class="shortcut-desc">Toggle Theme</span>
+            <span class="shortcut-keys"><kbd>T</kbd></span>
+          </li>
+          <li>
+            <span class="shortcut-desc">Show / Hide Shortcuts</span>
+            <span class="shortcut-keys"><kbd>?</kbd> or <kbd>H</kbd></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
