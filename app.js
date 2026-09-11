@@ -5,6 +5,20 @@ let draggedId = null;
 let dropTargetPosition = null;
 let editingId = null;
 let currentTheme = 'light';
+let randomTaskIndex = Math.floor(Math.random() * 10);
+
+const funRandomTasks = [
+  "High-five a potted plant 🪴",
+  "Do a 5-second victory dance 💃",
+  "Compliment yourself in the mirror 🪞",
+  "Drink a big glass of water 💧",
+  "Stare into space like a dramatic philosopher 🌌",
+  "Attempt a flawless moonwalk across the room 🕺",
+  "Tell a dad joke to nobody in particular 🧔",
+  "Pet the nearest pet (or a squishy plushie) 🐱",
+  "Inhale deeply & pretend you are a cloud ☁️",
+  "Take a mini stretch break and wiggle your toes 🦶"
+];
 
 // DOM Elements
 const themeToggleBtn = document.getElementById('theme-toggle-btn');
@@ -15,6 +29,7 @@ const shortcutsModal = document.getElementById('shortcuts-modal');
 const closeModalBtn = document.getElementById('close-modal-btn');
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
+const randomTaskBtn = document.getElementById('random-task-btn');
 const todoList = document.getElementById('todo-list');
 const emptyState = document.getElementById('empty-state');
 const filterBtns = document.querySelectorAll('.btn-filter');
@@ -133,6 +148,13 @@ function bindEvents() {
     todoInput.value = '';
     todoInput.focus();
   });
+
+  // Random Sparkle Task Button
+  if (randomTaskBtn) {
+    randomTaskBtn.addEventListener('click', () => {
+      addRandomTask();
+    });
+  }
 
   // Todo List Click (Toggle / Delete / Edit)
   todoList.addEventListener('click', (e) => {
@@ -375,6 +397,13 @@ function reorderTodos(draggedId, targetId, position) {
 
   saveTodos();
   render();
+}
+
+// Add Fun Random Task
+function addRandomTask() {
+  const taskText = funRandomTasks[randomTaskIndex];
+  randomTaskIndex = (randomTaskIndex + 1) % funRandomTasks.length;
+  addTodo(taskText);
 }
 
 // Add Todo
