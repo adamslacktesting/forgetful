@@ -725,11 +725,13 @@ kbd {
 
 .toast {
   pointer-events: auto;
+  position: relative;
+  overflow: hidden;
   background-color: var(--card-bg);
   border: var(--border-width) solid var(--border-color);
   border-radius: var(--radius-md);
   box-shadow: 6px 6px 0px var(--shadow-color);
-  padding: 12px 16px;
+  padding: 12px 16px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -757,6 +759,38 @@ kbd {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.toast-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.toast-timer {
+  font-size: 0.85rem;
+  font-weight: 700;
+  background-color: var(--filter-bg);
+  color: var(--text-color);
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 2px 2px 0px var(--shadow-color);
+}
+
+.toast-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  background-color: var(--primary-color);
+  width: 100%;
+  animation: toastProgress 5s linear forwards;
 }
 
 .btn-undo {
@@ -807,6 +841,15 @@ kbd {
   100% {
     opacity: 0;
     transform: translateY(10px) scale(0.9);
+  }
+}
+
+@keyframes toastProgress {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
   }
 }
 
