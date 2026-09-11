@@ -4,8 +4,12 @@ let currentFilter = 'all';
 let draggedId = null;
 let dropTargetPosition = null;
 let editingId = null;
+let currentTheme = 'light';
 
 // DOM Elements
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+const themeToggleIcon = document.getElementById('theme-toggle-icon');
+const themeToggleText = document.getElementById('theme-toggle-text');
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
 const todoList = document.getElementById('todo-list');
@@ -19,10 +23,55 @@ const confettiCanvas = document.getElementById('confetti-canvas');
 
 // Initialize State
 function init() {
+  initTheme();
   loadTodos();
   setupCanvas();
   bindEvents();
   render();
+}
+
+// Theme Management
+function initTheme() {
+  try {
+    const savedTheme = localStorage.getItem('forgetful_theme');
+    if (savedTheme) {
+      currentTheme = savedTheme;
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      currentTheme = 'dark';
+    } else {
+      currentTheme = 'light';
+    }
+  } catch (e) {
+    console.error('Failed to access localStorage for theme', e);
+    currentTheme = 'light';
+  }
+  applyTheme(currentTheme);
+}
+
+function applyTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+
+  if (themeToggleIcon && themeToggleText) {
+    if (theme === 'dark') {
+      themeToggleIcon.textContent = '☀️';
+      themeToggleText.textContent = 'Light Mode';
+    } else {
+      themeToggleIcon.textContent = '🌙';
+      themeToggleText.textContent = 'Dark Mode';
+    }
+  }
+
+  try {
+    localStorage.setItem('forgetful_theme', theme);
+  } catch (e) {
+    console.error('Failed to save theme to localStorage', e);
+  }
+}
+
+function toggleTheme() {
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  applyTheme(newTheme);
 }
 
 // Save todos to localStorage
@@ -56,6 +105,13 @@ function loadTodos() {
 
 // Event Bindings
 function bindEvents() {
+  // Theme toggle button click
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      toggleTheme();
+    });
+  }
+
   // Add Todo Form Submit
   todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
