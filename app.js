@@ -23,6 +23,7 @@ const countAllEl = document.getElementById('count-all');
 const countActiveEl = document.getElementById('count-active');
 const countCompletedEl = document.getElementById('count-completed');
 const confettiCanvas = document.getElementById('confetti-canvas');
+const toastContainer = document.getElementById('toast-container');
 
 // Initialize State
 function init() {
@@ -409,9 +410,81 @@ function deleteTodo(id) {
   if (editingId === id) {
     editingId = null;
   }
-  todos = todos.filter(t => t.id !== id);
+  const index = todos.findIndex(t => t.id === id);
+  if (index === -1) return;
+
+  const [deletedTodo] = todos.splice(index, 1);
   saveTodos();
   render();
+
+  showUndoToast(deletedTodo, index);
+}
+
+// Show Toast Notification with Undo option
+function showUndoToast(deletedTodo, originalIndex) {
+  if (!toastContainer) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+
+  const content = document.createElement('div');
+  content.className = 'toast-content';
+
+  const icon = document.createElement('span');
+  icon.textContent = '🗑️';
+
+  const message = document.createElement('span');
+  message.className = 'toast-message';
+  message.textContent = `Deleted "${deletedTodo.text}"`;
+
+  content.appendChild(icon);
+  content.appendChild(message);
+
+  const undoBtn = document.createElement('button');
+  undoBtn.className = 'btn-undo';
+  undoBtn.innerHTML = '<span>Undo</span> <span>↩️</span>';
+  undoBtn.setAttribute('aria-label', `Undo deletion of ${deletedTodo.text}`);
+
+  let isDismissed = false;
+
+  const dismissToast = () => {
+    if (isDismissed) return;
+    isDismissed = true;
+    toast.classList.add('toast-hiding');
+    toast.addEventListener('animationend', () => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    });
+  };
+
+  const timer = setTimeout(() => {
+    dismissToast();
+  }, 5000);
+
+  undoBtn.addEventListener('click', () => {
+    clearTimeout(timer);
+    if (!isDismissed) {
+      isDismissed = true;
+      // Restore task at its original position or closest valid index
+      const targetIndex = Math.min(originalIndex, todos.length);
+      todos.splice(targetIndex, 0, deletedTodo);
+      saveTodos();
+      render();
+
+      toast.classList.add('toast-hiding');
+      toast.addEventListener('animationend', () => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      });
+    }
+  });
+
+  toast.appendChild(content);
+  toast.appendChild(undoBtn);
+
+  toastContainer.appendChild(toast);
 }
 
 // Edit Todo Handlers
