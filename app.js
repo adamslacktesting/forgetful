@@ -276,7 +276,7 @@ function render() {
   countCompletedEl.textContent = completedCount;
 
   // Clear completed button state
-  if (completedCount > 0) {
+  if (completedCount > 0 && currentFilter !== 'active') {
     clearCompletedBtn.classList.remove('hidden');
   } else {
     clearCompletedBtn.classList.add('hidden');
