@@ -1,6 +1,8 @@
 // State Management
 let todos = [];
 let currentFilter = 'all';
+let draggedId = null;
+let dropTargetPosition = null;
 
 // DOM Elements
 const todoForm = document.getElementById('todo-form');
@@ -106,6 +108,98 @@ function bindEvents() {
   clearCompletedBtn.addEventListener('click', () => {
     clearCompleted();
   });
+
+  // Drag and Drop Events
+  bindDragAndDropEvents();
+}
+
+function bindDragAndDropEvents() {
+  todoList.addEventListener('dragstart', (e) => {
+    const item = e.target.closest('.todo-item');
+    if (!item) return;
+
+    draggedId = item.dataset.id;
+    item.classList.add('dragging');
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', draggedId);
+    }
+  });
+
+  todoList.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'move';
+    }
+
+    const item = e.target.closest('.todo-item');
+
+    const items = todoList.querySelectorAll('.todo-item');
+    items.forEach(el => {
+      if (el !== item) {
+        el.classList.remove('drag-over-above', 'drag-over-below');
+      }
+    });
+
+    if (!item || item.dataset.id === draggedId) return;
+
+    const rect = item.getBoundingClientRect();
+    const midpoint = rect.top + rect.height / 2;
+
+    if (e.clientY < midpoint) {
+      item.classList.remove('drag-over-below');
+      item.classList.add('drag-over-above');
+      dropTargetPosition = 'above';
+    } else {
+      item.classList.remove('drag-over-above');
+      item.classList.add('drag-over-below');
+      dropTargetPosition = 'below';
+    }
+  });
+
+  todoList.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const item = e.target.closest('.todo-item');
+    clearDragHighlights();
+
+    if (!item || !draggedId || item.dataset.id === draggedId) return;
+
+    const targetId = item.dataset.id;
+    reorderTodos(draggedId, targetId, dropTargetPosition);
+    draggedId = null;
+    dropTargetPosition = null;
+  });
+
+  todoList.addEventListener('dragend', () => {
+    clearDragHighlights();
+    draggedId = null;
+    dropTargetPosition = null;
+  });
+}
+
+function clearDragHighlights() {
+  const items = todoList.querySelectorAll('.todo-item');
+  items.forEach(el => {
+    el.classList.remove('dragging', 'drag-over-above', 'drag-over-below');
+  });
+}
+
+function reorderTodos(draggedId, targetId, position) {
+  const draggedIndex = todos.findIndex(t => t.id === draggedId);
+  if (draggedIndex === -1) return;
+
+  const [draggedItem] = todos.splice(draggedIndex, 1);
+
+  const targetIndex = todos.findIndex(t => t.id === targetId);
+  if (targetIndex === -1) {
+    todos.push(draggedItem);
+  } else {
+    const insertIndex = position === 'below' ? targetIndex + 1 : targetIndex;
+    todos.splice(insertIndex, 0, draggedItem);
+  }
+
+  saveTodos();
+  render();
 }
 
 // Add Todo
@@ -194,6 +288,13 @@ function createTodoElement(todo) {
   const li = document.createElement('li');
   li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
   li.dataset.id = todo.id;
+  li.draggable = true;
+
+  const dragHandle = document.createElement('div');
+  dragHandle.className = 'drag-handle';
+  dragHandle.innerHTML = '⋮⋮';
+  dragHandle.setAttribute('title', 'Drag to reorder');
+  dragHandle.setAttribute('aria-label', 'Drag handle');
 
   const contentDiv = document.createElement('div');
   contentDiv.className = 'todo-content';
@@ -217,6 +318,7 @@ function createTodoElement(todo) {
   deleteBtn.setAttribute('aria-label', 'Delete task');
   deleteBtn.innerHTML = '🗑️';
 
+  li.appendChild(dragHandle);
   li.appendChild(contentDiv);
   li.appendChild(deleteBtn);
 
