@@ -420,18 +420,60 @@ function addTodo(text) {
   render();
 }
 
+// Celebration Badges Text options
+const celebrationPhrases = [
+  "WOOHOO! 🎉",
+  "AWESOME! ✨",
+  "NAILED IT! 💥",
+  "BOOM! 🚀",
+  "GREAT JOB! ⭐",
+  "CRUSHED IT! 💪",
+  "VICTORY! 🏆",
+  "TA-DA! 🎩"
+];
+
 // Toggle Todo State
 function toggleTodo(id) {
   const todo = todos.find(t => t.id === id);
   if (!todo) return;
 
-  todo.completed = !todo.completed;
+  const newlyCompleted = !todo.completed;
+  todo.completed = newlyCompleted;
   saveTodos();
   render();
 
-  if (todo.completed) {
-    triggerConfetti();
+  if (newlyCompleted) {
+    const itemEl = todoList.querySelector(`.todo-item[data-id="${id}"]`);
+    if (itemEl) {
+      itemEl.classList.remove('celebrate');
+      // Trigger reflow for animation reset if re-triggered
+      void itemEl.offsetWidth;
+      itemEl.classList.add('celebrate');
+
+      // Spawn floating celebration badge above item
+      spawnCelebrationBadge(itemEl);
+    }
+    triggerConfetti(itemEl);
   }
+}
+
+function spawnCelebrationBadge(targetEl) {
+  const rect = targetEl.getBoundingClientRect();
+  const badge = document.createElement('div');
+  badge.className = 'celebration-badge';
+  badge.textContent = celebrationPhrases[Math.floor(Math.random() * celebrationPhrases.length)];
+
+  // Center horizontally over item, position vertically slightly above
+  badge.style.left = `${rect.left + rect.width / 2}px`;
+  badge.style.top = `${rect.top}px`;
+
+  document.body.appendChild(badge);
+
+  setTimeout(() => {
+    if (badge.parentNode) {
+      badge.parentNode.removeChild(badge);
+    }
+  }, 750);
 }
 
 // Delete Todo
@@ -719,55 +761,123 @@ function setupCanvas() {
   });
 }
 
-function triggerConfetti() {
-  // Simple playful confetti burst on task completion
+let confettiParticles = [];
+let confettiAnimationId = null;
+
+function triggerConfetti(targetEl) {
+  if (!confettiCanvas) return;
+
+  const colors = ['#FF5964', '#FFD166', '#06D6A0', '#118AB2', '#8338EC', '#FF9F1C', '#F72585'];
+  const shapes = ['circle', 'rect', 'star', 'ribbon'];
+
+  // Determine origins: primary origin around targetEl or screen top-middle
+  let origins = [];
+  if (targetEl) {
+    const rect = targetEl.getBoundingClientRect();
+    const itemX = rect.left + rect.width / 2;
+    const itemY = rect.top + rect.height / 2;
+    origins.push({ x: itemX, y: itemY, count: 45, speedScale: 1.2 });
+    origins.push({ x: Math.max(20, itemX - 180), y: Math.min(window.innerHeight, itemY + 40), count: 20, speedScale: 1.0 });
+    origins.push({ x: Math.min(window.innerWidth - 20, itemX + 180), y: Math.min(window.innerHeight, itemY + 40), count: 20, speedScale: 1.0 });
+  } else {
+    origins.push({ x: window.innerWidth / 2, y: window.innerHeight / 3, count: 70, speedScale: 1.0 });
+  }
+
+  origins.forEach(orig => {
+    for (let i = 0; i < orig.count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = (Math.random() * 12 + 6) * orig.speedScale;
+      confettiParticles.push({
+        x: orig.x,
+        y: orig.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - (Math.random() * 4 + 2),
+        gravity: 0.38,
+        drag: 0.96,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        shape: shapes[Math.floor(Math.random() * shapes.length)],
+        size: Math.random() * 8 + 6,
+        rotation: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - 0.5) * 0.3,
+        alpha: 1,
+        decay: Math.random() * 0.015 + 0.018
+      });
+    }
+  });
+
+  if (!confettiAnimationId) {
+    animateConfetti();
+  }
+}
+
+function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+  let rot = (Math.PI / 2) * 3;
+  let step = Math.PI / spikes;
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - outerRadius);
+  for (let i = 0; i < spikes; i++) {
+    let x = cx + Math.cos(rot) * outerRadius;
+    let y = cy + Math.sin(rot) * outerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+
+    x = cx + Math.cos(rot) * innerRadius;
+    y = cy + Math.sin(rot) * innerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+  }
+  ctx.lineTo(cx, cy - outerRadius);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function animateConfetti() {
   if (!confettiCanvas) return;
   const ctx = confettiCanvas.getContext('2d');
-  const particles = [];
-  const colors = ['#FF5964', '#FFD166', '#06D6A0', '#118AB2', '#8338EC'];
 
-  for (let i = 0; i < 40; i++) {
-    particles.push({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 3,
-      vx: (Math.random() - 0.5) * 12,
-      vy: (Math.random() - 0.7) * 12,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      radius: Math.random() * 6 + 4,
-      alpha: 1
-    });
-  }
+  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 
-  function animate() {
-    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-    let alive = false;
+  confettiParticles.forEach(p => {
+    p.vx *= p.drag;
+    p.vy = p.vy * p.drag + p.gravity;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rotation += p.vRot;
+    p.alpha -= p.decay;
+  });
 
-    particles.forEach(p => {
-      if (p.alpha > 0) {
-        alive = true;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.3; // gravity
-        p.alpha -= 0.02;
+  // Filter alive particles
+  confettiParticles = confettiParticles.filter(p => p.alpha > 0);
 
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, p.alpha);
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    });
+  confettiParticles.forEach(p => {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.fillStyle = p.color;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
 
-    if (alive) {
-      requestAnimationFrame(animate);
-    } else {
-      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    if (p.shape === 'circle') {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.shape === 'rect') {
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+    } else if (p.shape === 'ribbon') {
+      ctx.fillRect(-p.size / 4, -p.size, p.size / 2, p.size * 1.8);
+    } else if (p.shape === 'star') {
+      drawStar(ctx, 0, 0, 5, p.size, p.size / 2);
     }
-  }
 
-  animate();
+    ctx.restore();
+  });
+
+  if (confettiParticles.length > 0) {
+    confettiAnimationId = requestAnimationFrame(animateConfetti);
+  } else {
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    confettiAnimationId = null;
+  }
 }
 
 // Initial Call
