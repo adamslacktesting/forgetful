@@ -576,6 +576,85 @@ body {
   color: var(--text-muted);
 }
 
+/* Celebration Effects */
+.todo-item.celebrate {
+  animation: celebratePop 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.todo-item.celebrate .checkbox-custom {
+  animation: checkSpin 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.celebration-badge {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  background-color: var(--accent-yellow);
+  color: #2D3142;
+  border: 3px solid var(--border-color);
+  border-radius: 50px;
+  padding: 6px 16px;
+  box-shadow: 4px 4px 0px var(--shadow-color);
+  animation: floatUpBadge 0.75s ease-out forwards;
+  white-space: nowrap;
+}
+
+@keyframes celebratePop {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.08) rotate(-3deg);
+    background-color: var(--accent-yellow);
+  }
+  40% {
+    transform: scale(1.05) rotate(3deg);
+  }
+  60% {
+    transform: scale(1.02) rotate(-1deg);
+  }
+  80% {
+    transform: scale(1.01) rotate(0.5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes checkSpin {
+  0% {
+    transform: scale(0.6) rotate(-45deg);
+  }
+  50% {
+    transform: scale(1.35) rotate(15deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes floatUpBadge {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.5) rotate(-5deg);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-50%, -20px) scale(1.15) rotate(3deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -45px) scale(1) rotate(-2deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -70px) scale(0.8) rotate(0deg);
+  }
+}
+
 /* Animations */
 @keyframes popIn {
   0% {
