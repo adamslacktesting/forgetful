@@ -465,6 +465,9 @@ body {
 .todo-text {
   font-size: 1.2rem;
   font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
   word-break: break-word;
   transition: all 0.15s ease;
 }
@@ -934,6 +937,14 @@ kbd {
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
+  body {
+    padding: 20px 12px;
+  }
+
+  .card {
+    padding: 16px 12px;
+  }
+
   .toast-container {
     bottom: 16px;
     right: 16px;
@@ -941,25 +952,107 @@ kbd {
     width: auto;
     max-width: none;
   }
+
+  .app-header {
+    gap: 12px;
+  }
+
   .app-title {
+    order: -3;
     font-size: 3.2rem;
+  }
+
+  .app-subtitle {
+    order: -2;
+    font-size: 1.1rem;
+  }
+
+  .header-top {
+    order: -1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .header-actions {
+    justify-content: center;
   }
 
   .todo-form {
     flex-direction: column;
+    gap: 12px;
+  }
+
+  .todo-input {
+    font-size: 1.1rem;
+    padding: 12px 16px;
+    min-width: 0;
   }
 
   .btn-add,
   .btn-sparkle {
     width: 100%;
+    padding: 12px 20px;
   }
 
   .controls-bar {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
 
   .filter-group {
     justify-content: space-around;
+    padding: 4px;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .btn-filter {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .filter-count {
+    padding: 2px 6px;
+    font-size: 0.75rem;
+  }
+
+  .btn-clear {
+    width: 100%;
+    text-align: center;
+  }
+
+  .todo-item {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .todo-content {
+    gap: 8px;
+  }
+
+  .checkbox-custom {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+
+  .btn-delete {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+
+  .drag-handle {
+    font-size: 1.1rem;
+  }
+
+  .todo-text {
+    font-size: 1rem;
   }
 }
