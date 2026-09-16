@@ -52,6 +52,10 @@
   --clear-btn-hover: #3D222E;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
