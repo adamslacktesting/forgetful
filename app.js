@@ -34,6 +34,7 @@ const todoList = document.getElementById('todo-list');
 const emptyState = document.getElementById('empty-state');
 const filterBtns = document.querySelectorAll('.btn-filter');
 const clearCompletedBtn = document.getElementById('clear-completed-btn');
+const startFreshBtn = document.getElementById('start-fresh-btn');
 const countAllEl = document.getElementById('count-all');
 const countActiveEl = document.getElementById('count-active');
 const countCompletedEl = document.getElementById('count-completed');
@@ -206,6 +207,13 @@ function bindEvents() {
   clearCompletedBtn.addEventListener('click', () => {
     clearCompleted();
   });
+
+  // Start Fresh Click
+  if (startFreshBtn) {
+    startFreshBtn.addEventListener('click', () => {
+      startFresh();
+    });
+  }
 
   // Shortcuts Modal Controls
   if (shortcutsInfoBtn) {
@@ -623,6 +631,17 @@ function clearCompleted() {
   render();
 }
 
+// Start Fresh (Delete all tasks)
+function startFresh() {
+  if (todos.length === 0) return;
+  const confirmed = confirm("Are you sure you want to delete all tasks and start fresh?");
+  if (confirmed) {
+    todos = [];
+    saveTodos();
+    render();
+  }
+}
+
 // Render Todos and UI components
 function render() {
   // Filter logic
@@ -659,6 +678,15 @@ function render() {
     clearCompletedBtn.classList.remove('hidden');
   } else {
     clearCompletedBtn.classList.add('hidden');
+  }
+
+  // Start Fresh button state
+  if (startFreshBtn) {
+    if (totalCount > 0) {
+      startFreshBtn.classList.remove('hidden');
+    } else {
+      startFreshBtn.classList.add('hidden');
+    }
   }
 }
 
