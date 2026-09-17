@@ -169,6 +169,57 @@ body {
   letter-spacing: 1px;
   transform: rotate(-2deg);
   display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.badge:hover {
+  transform: rotate(-2deg) scale(1.05);
+}
+
+.badge:active {
+  transform: rotate(-2deg) scale(0.95);
+}
+
+.badge-wiggle {
+  animation: badgeWiggle 0.4s ease-in-out;
+}
+
+@keyframes badgeWiggle {
+  0% { transform: rotate(-2deg) scale(1); }
+  25% { transform: rotate(-10deg) scale(1.1); }
+  50% { transform: rotate(8deg) scale(1.1); }
+  75% { transform: rotate(-6deg) scale(1.05); }
+  100% { transform: rotate(-2deg) scale(1); }
+}
+
+.floating-mascot {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  font-size: 2.2rem;
+  animation: floatMascot 1.2s ease-out forwards;
+  user-select: none;
+}
+
+@keyframes floatMascot {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.4) rotate(-15deg);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -30px) scale(1.3) rotate(10deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -60px) scale(1.1) rotate(-8deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -90px) scale(0.8) rotate(5deg);
+  }
 }
 
 .app-title {
