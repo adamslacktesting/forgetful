@@ -181,10 +181,10 @@ body {
 }
 
 .app-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-color);
-  max-width: 500px;
+  max-width: 650px;
   opacity: 0.9;
 }
 
