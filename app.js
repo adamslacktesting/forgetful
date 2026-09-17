@@ -22,6 +22,7 @@ const funRandomTasks = [
 ];
 
 // DOM Elements
+const headerBadgeEl = document.querySelector('.badge');
 const appTitleEl = document.querySelector('.app-title');
 const themeToggleBtn = document.getElementById('theme-toggle-btn');
 const themeToggleIcon = document.getElementById('theme-toggle-icon');
@@ -134,6 +135,36 @@ function loadTodos() {
 
 // Event Bindings
 function bindEvents() {
+  // Badge click Easter Egg
+  if (headerBadgeEl) {
+    let badgeClickCount = 0;
+    const mascots = ['🦄', '👾', '🤖', '🛸', '🐙', '🦩', '🐱‍👤', '🐉', '✨'];
+    const originalBadgeText = headerBadgeEl.textContent;
+
+    headerBadgeEl.addEventListener('click', (e) => {
+      badgeClickCount++;
+
+      // Badge wiggle animation reset
+      headerBadgeEl.classList.remove('badge-wiggle');
+      void headerBadgeEl.offsetWidth;
+      headerBadgeEl.classList.add('badge-wiggle');
+
+      // Spawn floating mascot emoji
+      const mascotSymbol = mascots[Math.floor(Math.random() * mascots.length)];
+      spawnFloatingMascot(e.clientX, e.clientY, mascotSymbol);
+
+      if (badgeClickCount === 5) {
+        headerBadgeEl.textContent = "ALWAYS FORGETTING! 🤫";
+        showEasterEggToast("🤫 You unlocked the Forgetful Secret Badge!");
+        setTimeout(() => {
+          headerBadgeEl.textContent = originalBadgeText;
+        }, 3000);
+      } else if (badgeClickCount % 10 === 0) {
+        showEasterEggToast(`✨ You've poked the badge ${badgeClickCount} times!`);
+      }
+    });
+  }
+
   // App title color cycle click
   if (appTitleEl) {
     const titleColors = [
@@ -257,8 +288,9 @@ function bindEvents() {
     });
   }
 
-  // Global Keyboard Shortcuts
+  // Global Keyboard Shortcuts & Konami Code Listener
   document.addEventListener('keydown', handleGlobalShortcuts);
+  document.addEventListener('keydown', handleKonamiCode);
 
   // Drag and Drop Events
   bindDragAndDropEvents();
@@ -286,6 +318,117 @@ function setFilter(filter) {
     }
   });
   render();
+}
+
+// Konami Code Sequence: Up Up Down Down Left Right Left Right B A
+const konamiSequence = [
+  'ArrowUp', 'ArrowUp',
+  'ArrowDown', 'ArrowDown',
+  'ArrowLeft', 'ArrowRight',
+  'ArrowLeft', 'ArrowRight',
+  'b', 'a'
+];
+let konamiIndex = 0;
+
+function handleKonamiCode(e) {
+  const isModalOpen = shortcutsModal && !shortcutsModal.classList.contains('hidden');
+  const activeElement = document.activeElement;
+  const isInputActive = activeElement && (
+    activeElement.tagName === 'INPUT' ||
+    activeElement.tagName === 'TEXTAREA' ||
+    activeElement.isContentEditable
+  );
+
+  if (isInputActive || isModalOpen) {
+    konamiIndex = 0;
+    return;
+  }
+
+  const expectedKey = konamiSequence[konamiIndex];
+  const keyPressed = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+
+  if (keyPressed === expectedKey) {
+    konamiIndex++;
+    if (konamiIndex === konamiSequence.length) {
+      konamiIndex = 0;
+      triggerKonamiEasterEgg();
+    }
+  } else {
+    konamiIndex = 0;
+    if (keyPressed === konamiSequence[0]) {
+      konamiIndex = 1;
+    }
+  }
+}
+
+function triggerKonamiEasterEgg() {
+  triggerConfetti();
+  showEasterEggToast("🎮 KONAMI CODE ACTIVATED! Super Forgetful Mode!");
+
+  if (headerBadgeEl) {
+    const originalText = headerBadgeEl.textContent;
+    headerBadgeEl.textContent = "SUPER FORGETFUL! 🚀✨";
+    headerBadgeEl.classList.remove('badge-wiggle');
+    void headerBadgeEl.offsetWidth;
+    headerBadgeEl.classList.add('badge-wiggle');
+
+    setTimeout(() => {
+      headerBadgeEl.textContent = originalText;
+    }, 5000);
+  }
+}
+
+function spawnFloatingMascot(x, y, symbol) {
+  const mascot = document.createElement('div');
+  mascot.className = 'floating-mascot';
+  mascot.textContent = symbol;
+  mascot.style.left = `${x}px`;
+  mascot.style.top = `${y}px`;
+
+  document.body.appendChild(mascot);
+
+  setTimeout(() => {
+    if (mascot.parentNode) {
+      mascot.parentNode.removeChild(mascot);
+    }
+  }, 1200);
+}
+
+function showEasterEggToast(messageText) {
+  if (!toastContainer) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+
+  const content = document.createElement('div');
+  content.className = 'toast-content';
+
+  const icon = document.createElement('span');
+  icon.textContent = '🎁';
+
+  const message = document.createElement('span');
+  message.className = 'toast-message';
+  message.textContent = messageText;
+
+  content.appendChild(icon);
+  content.appendChild(message);
+
+  toast.appendChild(content);
+
+  const progressBar = document.createElement('div');
+  progressBar.className = 'toast-progress-bar';
+  toast.appendChild(progressBar);
+
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('toast-hiding');
+    toast.addEventListener('animationend', () => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    });
+  }, 4000);
 }
 
 function handleGlobalShortcuts(e) {
