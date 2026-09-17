@@ -22,6 +22,7 @@ const funRandomTasks = [
 ];
 
 // DOM Elements
+const appTitleEl = document.querySelector('.app-title');
 const themeToggleBtn = document.getElementById('theme-toggle-btn');
 const themeToggleIcon = document.getElementById('theme-toggle-icon');
 const themeToggleText = document.getElementById('theme-toggle-text');
@@ -133,6 +134,25 @@ function loadTodos() {
 
 // Event Bindings
 function bindEvents() {
+  // App title color cycle click
+  if (appTitleEl) {
+    const titleColors = [
+      'var(--primary-color)',
+      '#8338EC', // Purple
+      '#38BDF8', // Sky Blue
+      '#06D6A0', // Mint Green
+      '#FFD166', // Yellow
+      '#FF9F1C', // Orange
+      '#F72585'  // Neon Pink
+    ];
+    let currentColorIndex = 0;
+
+    appTitleEl.addEventListener('click', () => {
+      currentColorIndex = (currentColorIndex + 1) % titleColors.length;
+      appTitleEl.style.color = titleColors[currentColorIndex];
+    });
+  }
+
   // Theme toggle button click
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', () => {
