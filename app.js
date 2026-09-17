@@ -6,6 +6,7 @@ let dropTargetPosition = null;
 let editingId = null;
 let currentTheme = 'light';
 let randomTaskIndex = Math.floor(Math.random() * 10);
+let activeUndoToasts = [];
 
 const funRandomTasks = [
   "High-five a potted plant 🪴",
@@ -297,6 +298,17 @@ function handleGlobalShortcuts(e) {
     return;
   }
 
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+    if (activeUndoToasts.length > 0) {
+      e.preventDefault();
+      const toastToUndo = activeUndoToasts.pop();
+      if (toastToUndo && typeof toastToUndo.undo === 'function') {
+        toastToUndo.undo();
+      }
+      return;
+    }
+  }
+
   if (e.key === 'n' || e.key === 'N' || e.key === '/') {
     e.preventDefault();
     focusTodoInput();
@@ -546,10 +558,15 @@ function showUndoToast(deletedTodo, originalIndex) {
     if (countdownInterval) clearInterval(countdownInterval);
   };
 
+  const removeFromActiveToasts = () => {
+    activeUndoToasts = activeUndoToasts.filter(t => t.toastElement !== toast);
+  };
+
   const dismissToast = () => {
     if (isDismissed) return;
     isDismissed = true;
     cleanup();
+    removeFromActiveToasts();
     toast.classList.add('toast-hiding');
     toast.addEventListener('animationend', () => {
       if (toast.parentNode) {
@@ -569,10 +586,11 @@ function showUndoToast(deletedTodo, originalIndex) {
     }
   }, 1000);
 
-  undoBtn.addEventListener('click', () => {
+  const performUndo = () => {
     cleanup();
     if (!isDismissed) {
       isDismissed = true;
+      removeFromActiveToasts();
       // Restore task at its original position or closest valid index
       const targetIndex = Math.min(originalIndex, todos.length);
       todos.splice(targetIndex, 0, deletedTodo);
@@ -586,6 +604,15 @@ function showUndoToast(deletedTodo, originalIndex) {
         }
       });
     }
+  };
+
+  undoBtn.addEventListener('click', () => {
+    performUndo();
+  });
+
+  activeUndoToasts.push({
+    toastElement: toast,
+    undo: performUndo
   });
 
   toast.appendChild(content);
