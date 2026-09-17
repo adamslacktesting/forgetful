@@ -340,6 +340,13 @@ body {
   background-color: var(--text-color);
 }
 
+.action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .btn-clear {
   font-family: inherit;
   font-size: 0.9rem;
@@ -361,6 +368,20 @@ body {
 
 .btn-clear.hidden {
   display: none;
+}
+
+.btn-subtle {
+  font-weight: 600;
+  opacity: 0.82;
+  box-shadow: 2px 2px 0px var(--shadow-color);
+  background: transparent;
+}
+
+.btn-subtle:hover {
+  opacity: 1;
+  background-color: var(--clear-btn-hover);
+  box-shadow: 3px 3px 0px var(--shadow-color);
+  transform: translate(-1px, -1px);
 }
 
 /* Todo List */
@@ -1024,6 +1045,12 @@ kbd {
   .filter-count {
     padding: 2px 6px;
     font-size: 0.75rem;
+  }
+
+  .action-group {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .btn-clear {
