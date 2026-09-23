@@ -565,6 +565,7 @@ body {
   color: var(--todo-completed-text);
 }
 
+.btn-copy,
 .btn-edit {
   background: transparent;
   border: none;
@@ -579,15 +580,27 @@ body {
   user-select: none;
 }
 
+.btn-copy:hover,
 .btn-edit:hover {
   background-color: rgba(0, 0, 0, 0.08);
   transform: scale(1.15);
 }
 
+[data-theme="dark"] .btn-copy:hover,
+[data-theme="dark"] .btn-edit:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-copy:focus-visible,
 .btn-edit:focus-visible {
   opacity: 1;
   visibility: visible;
   outline: 2px solid var(--border-color);
+}
+
+.todo-item:hover .btn-copy {
+  opacity: 1;
+  visibility: visible;
 }
 
 .todo-item:not(.completed):hover .btn-edit {

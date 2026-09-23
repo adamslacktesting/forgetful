@@ -209,7 +209,7 @@ function bindEvents() {
     });
   }
 
-  // Todo List Click (Toggle / Delete / Edit)
+  // Todo List Click (Toggle / Delete / Edit / Copy)
   todoList.addEventListener('click', (e) => {
     const item = e.target.closest('.todo-item');
     if (!item) return;
@@ -218,6 +218,10 @@ function bindEvents() {
 
     if (e.target.closest('.btn-delete')) {
       deleteTodo(id);
+    } else if (e.target.closest('.btn-copy')) {
+      e.stopPropagation();
+      const copyBtn = e.target.closest('.btn-copy');
+      copyTodoText(id, copyBtn);
     } else if (e.target.closest('.btn-edit')) {
       e.stopPropagation();
       startEditing(id);
@@ -674,6 +678,96 @@ function deleteTodo(id) {
   showUndoToast(deletedTodo, index);
 }
 
+// Copy Todo Text
+function copyTodoText(id, buttonEl) {
+  const todo = todos.find(t => t.id === id);
+  if (!todo) return;
+
+  const textToCopy = todo.text;
+
+  const onSuccess = () => {
+    if (buttonEl) {
+      const originalHTML = buttonEl.innerHTML;
+      buttonEl.innerHTML = '✅';
+      setTimeout(() => {
+        buttonEl.innerHTML = originalHTML;
+      }, 1500);
+    }
+    showCopyToast(`Copied task to clipboard!`);
+  };
+
+  const onFailure = () => {
+    showCopyToast(`Failed to copy to clipboard`);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(textToCopy).then(onSuccess).catch(() => {
+      fallbackCopyText(textToCopy, onSuccess, onFailure);
+    });
+  } else {
+    fallbackCopyText(textToCopy, onSuccess, onFailure);
+  }
+}
+
+function fallbackCopyText(text, onSuccess, onFailure) {
+  try {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    textArea.style.top = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    const successful = document.execCommand('copy');
+    document.body.removeChild(textArea);
+    if (successful) {
+      onSuccess();
+    } else {
+      onFailure();
+    }
+  } catch (err) {
+    onFailure();
+  }
+}
+
+function showCopyToast(messageText) {
+  if (!toastContainer) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+
+  const content = document.createElement('div');
+  content.className = 'toast-content';
+
+  const icon = document.createElement('span');
+  icon.textContent = '📋';
+
+  const message = document.createElement('span');
+  message.className = 'toast-message';
+  message.textContent = messageText;
+
+  content.appendChild(icon);
+  content.appendChild(message);
+
+  toast.appendChild(content);
+
+  const progressBar = document.createElement('div');
+  progressBar.className = 'toast-progress-bar';
+  toast.appendChild(progressBar);
+
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('toast-hiding');
+    toast.addEventListener('animationend', () => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    });
+  }, 2500);
+}
+
 // Show Toast Notification with Undo option
 function showUndoToast(deletedTodo, originalIndex) {
   if (!toastContainer) return;
@@ -945,6 +1039,13 @@ function createTodoElement(todo) {
     span.className = 'todo-text';
     span.textContent = todo.text;
     contentDiv.appendChild(span);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn-copy';
+    copyBtn.setAttribute('aria-label', 'Copy task text');
+    copyBtn.setAttribute('title', 'Copy task text');
+    copyBtn.innerHTML = '📋';
+    contentDiv.appendChild(copyBtn);
 
     if (!todo.completed) {
       const editBtn = document.createElement('button');
