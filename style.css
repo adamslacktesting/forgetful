@@ -575,6 +575,7 @@ body {
   border-radius: 6px;
   opacity: 0;
   visibility: hidden;
+  display: none;
   transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease;
   flex-shrink: 0;
   user-select: none;
@@ -595,17 +596,20 @@ body {
 .btn-edit:focus-visible {
   opacity: 1;
   visibility: visible;
+  display: inline-flex;
   outline: 2px solid var(--border-color);
 }
 
 .todo-item:hover .btn-copy {
   opacity: 1;
   visibility: visible;
+  display: inline-flex;
 }
 
 .todo-item:not(.completed):hover .btn-edit {
   opacity: 1;
   visibility: visible;
+  display: inline-flex;
 }
 
 .todo-edit-input {
@@ -1063,12 +1067,14 @@ kbd {
 
   .app-title {
     order: 1;
-    font-size: 3.2rem;
+    font-size: 3rem;
+    word-break: break-word;
   }
 
   .app-subtitle {
     order: 2;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    padding: 0 8px;
   }
 
   .header-top {
@@ -1076,7 +1082,7 @@ kbd {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
     margin-top: 4px;
   }
 
@@ -1095,19 +1101,22 @@ kbd {
 
   .todo-input {
     flex: 1 0 100%;
-    font-size: 1.1rem;
-    padding: 12px 16px;
+    font-size: 0.95rem;
+    padding: 12px 14px;
     min-width: 0;
+    text-overflow: ellipsis;
   }
 
   .btn-add {
     flex: 1;
+    font-size: 1rem;
     padding: 12px 16px;
   }
 
   .btn-sparkle {
     flex: 0 0 auto;
-    padding: 12px 18px;
+    font-size: 1.2rem;
+    padding: 12px 16px;
   }
 
   .controls-bar {
@@ -1138,22 +1147,33 @@ kbd {
 
   .action-group {
     width: 100%;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
   }
 
   .btn-clear {
-    width: 100%;
+    flex: 1;
     text-align: center;
+    padding: 8px 10px;
+    font-size: 0.85rem;
   }
 
   .todo-item {
     padding: 10px 12px;
-    gap: 8px;
+    gap: 6px;
   }
 
   .todo-content {
-    gap: 8px;
+    gap: 6px;
+  }
+
+  .btn-copy,
+  .btn-edit {
+    display: inline-flex;
+    opacity: 1;
+    visibility: visible;
+    padding: 2px 2px;
+    font-size: 0.9rem;
   }
 
   .checkbox-custom {
