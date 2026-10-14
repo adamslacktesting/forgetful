@@ -574,7 +574,7 @@ body {
   padding: 2px 6px;
   border-radius: 6px;
   opacity: 0;
-  visibility: hidden;
+  display: none;
   transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease;
   flex-shrink: 0;
   user-select: none;
@@ -594,18 +594,18 @@ body {
 .btn-copy:focus-visible,
 .btn-edit:focus-visible {
   opacity: 1;
-  visibility: visible;
+  display: inline-flex;
   outline: 2px solid var(--border-color);
 }
 
 .todo-item:hover .btn-copy {
   opacity: 1;
-  visibility: visible;
+  display: inline-flex;
 }
 
 .todo-item:not(.completed):hover .btn-edit {
   opacity: 1;
-  visibility: visible;
+  display: inline-flex;
 }
 
 .todo-edit-input {
@@ -1058,7 +1058,14 @@ kbd {
   }
 
   .app-header {
-    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-top {
+    display: contents;
   }
 
   .app-title {
@@ -1066,25 +1073,24 @@ kbd {
     font-size: 3.2rem;
   }
 
-  .app-subtitle {
+  .badge {
     order: 2;
-    font-size: 1.1rem;
+    margin: 2px 0;
   }
 
-  .header-top {
+  .app-subtitle {
     order: 3;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 4px;
+    font-size: 1rem;
   }
 
   .header-actions {
+    order: 4;
     display: flex;
+    flex-direction: row;
     justify-content: center;
     gap: 10px;
     width: 100%;
+    margin-top: 4px;
   }
 
   .todo-form {
@@ -1138,13 +1144,21 @@ kbd {
 
   .action-group {
     width: 100%;
-    flex-direction: column;
+    display: flex;
+    flex-direction: row;
     gap: 8px;
   }
 
   .btn-clear {
-    width: 100%;
+    flex: 1;
     text-align: center;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+
+  .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   .todo-item {
